@@ -1,19 +1,10 @@
-import { randomUUID } from "node:crypto";
-import { sql } from "drizzle-orm";
-import { index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
-export const transactions = sqliteTable(
-  "transactions",
+export const wallets = sqliteTable(
+  'wallets',
   {
-    id: text("id", { length: 36 }).notNull().primaryKey().default(randomUUID()),
-    title: text("title", { length: 255 }).notNull(),
-    amount: real("amount").notNull(), // THIS WILL HAVE ROUNDING ERRORS, USE DECIMAL(10, 2) IN ANOTHER SQL DB
-    session_id: text("session_id", { length: 36 }).notNull(),
-    created_at: integer("created_at", { mode: "timestamp" })
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP`),
+    userId: text('user_id', { length: 24 }).notNull().primaryKey(),
+    balance: integer('balance').notNull().default(0)
   },
-  (table) => ({
-    sessionIdIdx: index("idx_session_id").on(table.session_id),
-  }),
+  table => [index('idx_user_id').on(table.userId)]
 );

@@ -11,7 +11,9 @@ const envSchema = z.object({
   REDIS_URL: z.string(),
   PORT: z.coerce.number().default(3333),
   COOKIE_SECRET: z.string().min(32),
-  RATE_LIMIT_MAX: z.coerce.number().default(10)
+  RATE_LIMIT_MAX: z.coerce.number().default(10),
+  AUTH_API_URL: z.string().url(),
+  TOKEN_SECRET: z.string().min(32)
 });
 
 const _env = envSchema.safeParse({
@@ -19,7 +21,9 @@ const _env = envSchema.safeParse({
   // For Render.com PostgreSQL
   DATABASE_URL: process.env.DATABASE_URL || process.env.POSTGRES_EXTERNAL_URL,
   // For Render.com Redis
-  REDIS_URL: process.env.REDIS_URL || process.env.REDIS_EXTERNAL_URL
+  REDIS_URL: process.env.REDIS_URL || process.env.REDIS_EXTERNAL_URL,
+  AUTH_API_URL: process.env.AUTH_API_URL,
+  TOKEN_SECRET: process.env.TOKEN_SECRET
 });
 
 if (!_env.success) {

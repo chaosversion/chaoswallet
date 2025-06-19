@@ -4,13 +4,18 @@ import { fastifyRateLimit } from '@fastify/rate-limit';
 import { fastify } from 'fastify';
 import { ZodError } from 'zod';
 import { AppError } from './errors/app-error';
-import { healthCheckRoutes } from './routes/health_check.routes';
-import { transactionsRoutes } from './routes/transactions.routes';
+import { healthCheckRoutes } from './routes/health.routes';
 import { env } from './env';
+import { DrizzleWalletRepository } from './repositories/drizzle/wallet.repository';
+import { walletRoutes } from './routes/wallet.routes';
+import { UnauthorizedError } from './errors/authorization-error';
 
 export const app = fastify({
   logger: true
 });
+
+// Repositories
+app.decorate('walletRepository', new DrizzleWalletRepository());
 
 // Register plugins and routes
 app.register(fastifyCookie, {
@@ -35,7 +40,7 @@ app.register(fastifyRateLimit, {
 });
 
 // Register routes
-app.register(transactionsRoutes, { prefix: 'transactions' });
+app.register(walletRoutes, { prefix: '/wallet' });
 app.register(healthCheckRoutes);
 
 // Error handler
@@ -50,6 +55,13 @@ app.setErrorHandler((error, _, reply) => {
   if (error instanceof AppError) {
     return reply.status(error.statusCode).send({
       type: 'application_error',
+      message: error.message
+    });
+  }
+
+  if (error instanceof UnauthorizedError) {
+    return reply.status(401).send({
+      type: 'unauthorized',
       message: error.message
     });
   }
