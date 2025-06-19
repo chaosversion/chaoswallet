@@ -1,4 +1,4 @@
-import type { JWTPayload as JoseJWTPayload } from 'jose';
+import type { JWTPayload as JoseJWTPayload } from "jose";
 
 export interface JWTToken extends JoseJWTPayload {
   sessionId: string;

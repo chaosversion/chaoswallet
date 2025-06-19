@@ -1,9 +1,9 @@
-import { db } from '@/db/drizzle';
-import { wallets } from '@/db/schema';
-import { eq } from 'drizzle-orm';
-import type { Wallet, WalletRepository } from '../interfaces/wallet.repository';
+import { db } from "@/db/drizzle";
+import { wallets } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import type { Wallet, WalletRepository } from "../interfaces/wallet.repository";
 
-declare module 'fastify' {
+declare module "fastify" {
   interface FastifyInstance {
     walletRepository: WalletRepository;
   }
@@ -21,7 +21,7 @@ export class DrizzleWalletRepository implements WalletRepository {
       .insert(wallets)
       .values({
         userId,
-        balance: 0
+        balance: 0,
       })
       .returning();
 
@@ -34,15 +34,12 @@ export class DrizzleWalletRepository implements WalletRepository {
       .from(wallets)
       .where(eq(wallets.userId, userId))
       .limit(1)
-      .then(rows => rows[0] || null);
+      .then((rows) => rows[0] || null);
 
     return wallet;
   }
 
   async updateBalance(userId: string, amount: number): Promise<void> {
-    await this.db
-      .update(wallets)
-      .set({ balance: amount })
-      .where(eq(wallets.userId, userId));
+    await this.db.update(wallets).set({ balance: amount }).where(eq(wallets.userId, userId));
   }
 }
